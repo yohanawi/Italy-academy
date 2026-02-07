@@ -1,6 +1,10 @@
-@extends('layout._default')
+<x-default-layout>
 
-@section('content')
+    @section('title')
+        Blog Management
+    @endsection
+
+
     <!--begin::Toolbar-->
     <div class="toolbar py-5 py-lg-15" id="kt_toolbar">
         <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
@@ -57,6 +61,7 @@
                                 <th class="min-w-100px">Status</th>
                                 <th class="min-w-100px">Published Date</th>
                                 <th class="min-w-80px">Views</th>
+                                <th class="min-w-80px">Comments</th>
                                 <th class="text-end min-w-100px">Actions</th>
                             </tr>
                         </thead>
@@ -93,6 +98,12 @@
                                     </td>
                                     <td>{{ $blog->published_date ? $blog->published_date->format('M d, Y') : '-' }}</td>
                                     <td>{{ number_format($blog->views) }}</td>
+                                    <td>
+                                        <span class="badge badge-light-info">
+                                            <i class="fas fa-comments"></i>
+                                            {{ $blog->comments_count ?? $blog->comments()->count() }}
+                                        </span>
+                                    </td>
                                     <td class="text-end">
                                         <a href="{{ route('admin.blogs.edit', $blog) }}"
                                             class="btn btn-sm btn-light-primary">
@@ -111,7 +122,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-10">
+                                    <td colspan="8" class="text-center py-10">
                                         <div class="text-gray-600 fs-4">No blogs found</div>
                                         <a href="{{ route('admin.blogs.create') }}" class="btn btn-primary mt-5">
                                             <i class="fas fa-plus"></i> Create Your First Blog
@@ -135,4 +146,4 @@
         <!--end::Card-->
     </div>
     <!--end::Container-->
-@endsection
+</x-default-layout>

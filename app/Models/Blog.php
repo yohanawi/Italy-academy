@@ -56,6 +56,14 @@ class Blog extends Model
     }
 
     /**
+     * Get the comments for the blog
+     */
+    public function comments()
+    {
+        return $this->hasMany(BlogComment::class);
+    }
+
+    /**
      * Scope for published blogs
      */
     public function scopePublished($query)

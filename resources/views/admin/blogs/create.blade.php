@@ -1,6 +1,10 @@
-@extends('layout._default')
+<x-default-layout>
 
-@section('content')
+    @section('title')
+        Create Blog
+    @endsection
+
+
     <!--begin::Toolbar-->
     <div class="toolbar py-5 py-lg-15" id="kt_toolbar">
         <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
@@ -28,6 +32,18 @@
 
     <!--begin::Container-->
     <div id="kt_content_container" class="container-xxl">
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading">Please fix the following errors:</h4>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <form action="{{ route('admin.blogs.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row g-5">
@@ -39,8 +55,8 @@
                             <div class="mb-5">
                                 <label class="required form-label">Blog Title</label>
                                 <input type="text" name="title"
-                                    class="form-control @error('title') is-invalid @enderror" placeholder="Enter blog title"
-                                    value="{{ old('title') }}" required>
+                                    class="form-control @error('title') is-invalid @enderror"
+                                    placeholder="Enter blog title" value="{{ old('title') }}" required>
                                 @error('title')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -88,9 +104,12 @@
                             <!--begin::Status-->
                             <div class="mb-5">
                                 <label class="required form-label">Status</label>
-                                <select name="status" class="form-select @error('status') is-invalid @enderror" required>
-                                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Published
+                                <select name="status" class="form-select @error('status') is-invalid @enderror"
+                                    required>
+                                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft
+                                    </option>
+                                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>
+                                        Published
                                     </option>
                                 </select>
                                 @error('status')
@@ -145,8 +164,8 @@
                             <div class="mb-5">
                                 <label class="form-label">Author Name</label>
                                 <input type="text" name="author_name"
-                                    class="form-control @error('author_name') is-invalid @enderror" placeholder="John Doe"
-                                    value="{{ old('author_name', Auth::user()->name) }}">
+                                    class="form-control @error('author_name') is-invalid @enderror"
+                                    placeholder="John Doe" value="{{ old('author_name', Auth::user()->name) }}">
                                 @error('author_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -186,7 +205,7 @@
         </form>
     </div>
     <!--end::Container-->
-@endsection
+</x-default-layout>
 
 @push('scripts')
     <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>

@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'role',
         'last_login_at',
         'last_login_ip',
         'profile_photo_path',
@@ -65,5 +66,42 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getDefaultAddressAttribute()
     {
         return $this->addresses?->first();
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is developer
+     */
+    public function isDeveloper(): bool
+    {
+        return $this->role === 'developer';
+    }
+
+    /**
+     * Check if user has admin or developer access
+     */
+    public function hasAdminAccess(): bool
+    {
+        return in_array($this->role, ['admin', 'developer']);
+    }
+
+    /**
+     * Get user role display name
+     */
+    public function getRoleDisplayName(): string
+    {
+        return match ($this->role) {
+            'admin' => 'Administrator',
+            'developer' => 'Developer',
+            'customer' => 'Customer',
+            default => ucfirst($this->role),
+        };
     }
 }

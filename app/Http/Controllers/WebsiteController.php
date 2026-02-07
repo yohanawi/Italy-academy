@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
+use App\Models\BlogComment;
+use App\Models\ContactSubmission;
 use Illuminate\Http\Request;
 
 class WebsiteController extends Controller
@@ -76,6 +78,27 @@ class WebsiteController extends Controller
     }
 
     /**
+     * Store contact form submission
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeContact(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:191',
+            'email' => 'required|email|max:191',
+            'phone' => 'nullable|string|max:20',
+            'subject' => 'required|string|max:191',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        ContactSubmission::create($validated);
+
+        return redirect()->back()->with('success', 'Thank you for your message! We will get back to you soon.');
+    }
+
+    /**
      * Display blogs listing
      *
      * @return \Illuminate\View\View
@@ -133,5 +156,28 @@ class WebsiteController extends Controller
             ->get();
 
         return view('website.blogs.show', compact('seoData', 'blog', 'relatedBlogs'));
+    }
+
+    /**
+     * Store blog comment
+     *
+     * @param Request $request
+     * @param string $slug
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeComment(Request $request, $slug)
+    {
+        $blog = Blog::published()->where('slug', $slug)->firstOrFail();
+
+        $validated = $request->validate([
+            'comment' => 'required|string|max:1000',
+            'rating' => 'nullable|integer|min:1|max:5',
+        ]);
+
+        $validated['blog_id'] = $blog->id;
+
+        BlogComment::create($validated);
+
+        return redirect()->back()->with('comment_success', 'Thank you for your review! Your comment has been added successfully.');
     }
 }

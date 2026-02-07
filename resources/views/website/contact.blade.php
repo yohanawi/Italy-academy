@@ -19,34 +19,74 @@
                     <p class="form-description">Have questions? We'd love to hear from you. Send us a message and we'll
                         respond as soon as possible.</p>
 
-                    <form class="contact-form">
+                    @if (session('success'))
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <strong>Please fix the following errors:</strong>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('contact.store') }}" method="POST" class="contact-form">
+                        @csrf
                         <div class="form-group">
                             <label for="name">Full Name *</label>
-                            <input type="text" id="name" name="name" required placeholder="Your name">
+                            <input type="text" id="name" name="name" required placeholder="Your name"
+                                value="{{ old('name') }}">
+                            @error('name')
+                                <span class="error-text">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="email">Email Address *</label>
                             <input type="email" id="email" name="email" required
-                                placeholder="your.email@example.com">
+                                placeholder="your.email@example.com" value="{{ old('email') }}">
+                            @error('email')
+                                <span class="error-text">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" placeholder="+39 123 456 7890">
+                            <input type="tel" id="phone" name="phone" placeholder="+39 123 456 7890"
+                                value="{{ old('phone') }}">
+                            @error('phone')
+                                <span class="error-text">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="subject">Subject *</label>
-                            <input type="text" id="subject" name="subject" required placeholder="How can we help?">
+                            <input type="text" id="subject" name="subject" required placeholder="How can we help?"
+                                value="{{ old('subject') }}">
+                            @error('subject')
+                                <span class="error-text">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="message">Message *</label>
-                            <textarea id="message" name="message" rows="5" required placeholder="Tell us more about your inquiry..."></textarea>
+                            <textarea id="message" name="message" rows="5" required placeholder="Tell us more about your inquiry...">{{ old('message') }}</textarea>
+                            @error('message')
+                                <span class="error-text">{{ $message }}</span>
+                            @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
                     </form>
                 </div>
 
@@ -199,6 +239,64 @@
             min-height: 120px;
         }
 
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert i {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-success i {
+            color: #28a745;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-danger i {
+            color: #dc3545;
+        }
+
+        .alert ul {
+            margin: 5px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .alert li {
+            margin-bottom: 5px;
+        }
+
+        .error-text {
+            color: var(--secondary-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .btn-block {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
         .contact-info-cards {
             display: flex;
             flex-direction: column;
@@ -304,23 +402,4 @@
             }
         }
     </style>
-@endpush
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const contactForm = document.querySelector('.contact-form');
-
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-
-                    // Here you would typically send the form data to the server
-                    // For now, we'll just show an alert
-                    alert('Thank you for your message! We will get back to you soon.');
-                    contactForm.reset();
-                });
-            }
-        });
-    </script>
 @endpush

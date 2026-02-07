@@ -19,12 +19,19 @@ class UsersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->rawColumns(['user', 'last_login_at'])
+            ->rawColumns(['user', 'role', 'last_login_at'])
             ->editColumn('user', function (User $user) {
                 return view('pages/apps.user-management.users.columns._user', compact('user'));
             })
             ->editColumn('role', function (User $user) {
-                return ucwords($user->roles->first()?->name);
+                $roleDisplay = $user->getRoleDisplayName();
+                $badgeClass = match ($user->role) {
+                    'admin' => 'badge-light-danger',
+                    'developer' => 'badge-light-info',
+                    'customer' => 'badge-light-success',
+                    default => 'badge-light-secondary',
+                };
+                return sprintf('<div class="badge %s fw-bold">%s</div>', $badgeClass, $roleDisplay);
             })
             ->editColumn('last_login_at', function (User $user) {
                 return sprintf('<div class="badge badge-light fw-bold">%s</div>', $user->last_login_at ? $user->last_login_at->diffForHumans() : $user->updated_at->diffForHumans());

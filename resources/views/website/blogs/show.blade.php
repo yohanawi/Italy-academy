@@ -83,6 +83,99 @@
                         </div>
                     </div>
                     <!--end::Share Section-->
+
+                    <!--begin::Comments Section-->
+                    <div class="blog-comments-section">
+                        <h3 class="comments-title">
+                            <i class="fas fa-comments"></i>
+                            Reviews & Comments ({{ $blog->comments->count() }})
+                        </h3>
+
+                        <!--begin::Comment Form-->
+                        <div class="comment-form-card">
+                            <h4>Leave a Review</h4>
+                            @if (session('comment_success'))
+                                <div class="alert alert-success">
+                                    {{ session('comment_success') }}
+                                </div>
+                            @endif
+                            <form action="{{ route('blogs.comments.store', $blog->slug) }}" method="POST">
+                                @csrf
+                                <!--begin::Rating-->
+                                <div class="rating-input">
+                                    <label>Rating (optional)</label>
+                                    <div class="star-rating">
+                                        <input type="radio" name="rating" value="5" id="star5">
+                                        <label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" name="rating" value="4" id="star4">
+                                        <label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" name="rating" value="3" id="star3">
+                                        <label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" name="rating" value="2" id="star2">
+                                        <label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+                                        <input type="radio" name="rating" value="1" id="star1">
+                                        <label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+                                    </div>
+                                    @error('rating')
+                                        <span class="error-message">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <!--end::Rating-->
+
+                                <!--begin::Comment-->
+                                <div class="form-group">
+                                    <label for="comment">Your Review</label>
+                                    <textarea name="comment" id="comment" rows="5" placeholder="Share your thoughts about this article..." required>{{ old('comment') }}</textarea>
+                                    @error('comment')
+                                        <span class="error-message">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <!--end::Comment-->
+
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Submit Review
+                                </button>
+                            </form>
+                        </div>
+                        <!--end::Comment Form-->
+
+                        <!--begin::Comments List-->
+                        @if ($blog->comments->count() > 0)
+                            <div class="comments-list">
+                                @foreach ($blog->comments()->latest()->get() as $comment)
+                                    <div class="comment-item">
+                                        <div class="comment-avatar">
+                                            <i class="fas fa-user-circle"></i>
+                                        </div>
+                                        <div class="comment-content">
+                                            <div class="comment-header">
+                                                <span class="comment-author">Anonymous User</span>
+                                                <span class="comment-date">
+                                                    {{ $comment->created_at->diffForHumans() }}
+                                                </span>
+                                            </div>
+                                            @if ($comment->rating)
+                                                <div class="comment-rating">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <i
+                                                            class="fas fa-star {{ $i <= $comment->rating ? 'active' : '' }}"></i>
+                                                    @endfor
+                                                </div>
+                                            @endif
+                                            <p class="comment-text">{{ $comment->comment }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="no-comments">
+                                <i class="fas fa-comment-slash"></i>
+                                <p>No reviews yet. Be the first to share your thoughts!</p>
+                            </div>
+                        @endif
+                        <!--end::Comments List-->
+                    </div>
+                    <!--end::Comments Section-->
                 </div>
 
                 <div class="blog-sidebar">
@@ -446,6 +539,231 @@
 
         .related-post-date i {
             color: var(--primary-color);
+        }
+
+        /* Comments Section Styles */
+        .blog-comments-section {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+
+        .comments-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .comments-title i {
+            color: var(--primary-color);
+        }
+
+        .comment-form-card {
+            background-color: var(--tertiary-color);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+
+        .comment-form-card h4 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .rating-input {
+            margin-bottom: 20px;
+        }
+
+        .rating-input label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            cursor: pointer;
+            font-size: 30px;
+            color: #ddd;
+            transition: all 0.2s ease;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover~label,
+        .star-rating input:checked~label {
+            color: #ffc107;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .error-message {
+            color: var(--secondary-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #00803d;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 15px;
+            padding: 25px;
+            background-color: var(--tertiary-color);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .comment-item:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .comment-avatar {
+            flex-shrink: 0;
+        }
+
+        .comment-avatar i {
+            font-size: 48px;
+            color: var(--primary-color);
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 16px;
+        }
+
+        .comment-date {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .comment-rating {
+            margin-bottom: 10px;
+        }
+
+        .comment-rating i {
+            color: #ddd;
+            font-size: 16px;
+        }
+
+        .comment-rating i.active {
+            color: #ffc107;
+        }
+
+        .comment-text {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .no-comments {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .no-comments i {
+            font-size: 64px;
+            color: var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .no-comments p {
+            font-size: 18px;
+            margin: 0;
         }
 
         @media (max-width: 1200px) {
